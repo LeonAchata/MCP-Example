@@ -1,4 +1,4 @@
-"""MCP Client implementation."""
+"""MCP Client implementation (renamed module)."""
 
 import logging
 from typing import Any, Dict, List, Optional

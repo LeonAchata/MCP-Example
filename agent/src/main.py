@@ -6,7 +6,7 @@ from fastapi import FastAPI
 import uvicorn
 
 from config import setup_logging, settings
-from mcp import MCPClient
+from mcp_client import MCPClient
 from graph import create_workflow
 from api.routes import router, set_workflow, set_mcp_client
 
