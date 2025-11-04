@@ -1,0 +1,21 @@
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+httpx
+
+# AWS Bedrock
+boto3
+botocore
+
+# OpenAI
+openai
+
+# Google Gemini
+google-generativeai
+
+# Cache
+cachetools
+
+# Utilities
+python-dotenv
