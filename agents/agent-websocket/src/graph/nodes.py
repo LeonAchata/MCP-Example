@@ -1,6 +1,7 @@
 """Workflow nodes for WebSocket agent."""
 
 import logging
+import json
 from typing import Dict, Any
 from datetime import datetime
 from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
@@ -38,41 +39,89 @@ def process_input_node(state: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def llm_node(state: Dict[str, Any], llm, mcp_client) -> Dict[str, Any]:
+def llm_node(state: Dict[str, Any], llm_client, mcp_client) -> Dict[str, Any]:
     """
-    Call LLM (Bedrock) with tools.
+    Call LLM Gateway to process messages and decide next action.
     
     Args:
         state: Current agent state
-        llm: Bedrock LLM instance
+        llm_client: LLM Gateway client
         mcp_client: MCP client for tools
         
     Returns:
         Updated state
     """
-    logger.info("Node: llm | Calling Bedrock with MCP tools")
+    logger.info("Node: llm | Calling LLM via Gateway")
     
     messages = state.get("messages", [])
     steps = state.get("steps", [])
     
-    # Get tools from MCP
+    # Get tools from MCP in standard format
     tools = mcp_client.get_tools_for_bedrock()
-    tool_names = [t.get('name', 'unknown') if isinstance(t, dict) else str(t) for t in tools]
-    logger.info(f"Node: llm | Available tools: {tool_names}")
     
-    # Bind tools to LLM
-    llm_with_tools = llm.bind_tools(tools)
+    # Create system message with tool information
+    tool_descriptions = []
+    for tool in tools:
+        tool_info = f"- {tool['name']}: {tool.get('description', 'No description')}"
+        if 'inputSchema' in tool:
+            tool_info += f"\n  Parameters: {json.dumps(tool['inputSchema'].get('properties', {}))}"
+        tool_descriptions.append(tool_info)
     
-    # Call LLM
-    response = llm_with_tools.invoke(messages)
+    system_prompt = f"""You are a helpful AI assistant with access to the following tools:
+
+{chr(10).join(tool_descriptions)}
+
+When you need to use a tool, respond with a tool call in this exact format:
+TOOL_CALL: tool_name
+ARGUMENTS: {{"arg1": "value1", "arg2": "value2"}}
+
+If you don't need any tools, just respond normally to help the user."""
     
-    # Log response
-    if hasattr(response, 'tool_calls') and response.tool_calls:
-        logger.info(f"Node: llm | Bedrock requested {len(response.tool_calls)} tool calls")
-        for tc in response.tool_calls:
-            logger.info(f"Node: llm | Tool call: {tc.get('name')} with args {tc.get('args')}")
-    else:
-        logger.info(f"Node: llm | Bedrock response: Final answer ready")
+    # Prepare messages for LLM with system prompt
+    from langchain_core.messages import HumanMessage
+    llm_messages = [HumanMessage(content=system_prompt)] + messages
+    
+    # Call LLM via Gateway (synchronous call in async context handled by workflow)
+    import asyncio
+    response = asyncio.run(llm_client.generate(
+        messages=llm_messages,
+        temperature=0.7,
+        max_tokens=2000
+    ))
+    
+    # Check if response contains tool calls
+    response_text = response.content
+    has_tool_call = "TOOL_CALL:" in response_text
+    
+    if has_tool_call:
+        # Parse tool call from response
+        try:
+            lines = response_text.strip().split('\n')
+            tool_name = None
+            tool_args = {}
+            
+            for line in lines:
+                if line.startswith("TOOL_CALL:"):
+                    tool_name = line.replace("TOOL_CALL:", "").strip()
+                elif line.startswith("ARGUMENTS:"):
+                    args_str = line.replace("ARGUMENTS:", "").strip()
+                    tool_args = json.loads(args_str)
+            
+            if tool_name:
+                # Add tool call info to response
+                response.additional_kwargs["tool_calls"] = [{
+                    "name": tool_name,
+                    "args": tool_args,
+                    "id": f"call_{datetime.now().timestamp()}"
+                }]
+                # Store as attribute for compatibility
+                response.tool_calls = response.additional_kwargs["tool_calls"]
+                logger.info(f"Node: llm | Parsed tool call: {tool_name}")
+        except Exception as e:
+            logger.error(f"Node: llm | Error parsing tool call: {str(e)}")
+            has_tool_call = False
+    
+    logger.info(f"Node: llm | Response received: has_tool_calls={has_tool_call}")
     
     # Add step
     steps.append({

@@ -2,7 +2,6 @@
 
 import logging
 from langgraph.graph import StateGraph, START, END
-from langchain_aws import ChatBedrock
 
 from .state import AgentState
 from .nodes import (
@@ -13,6 +12,7 @@ from .nodes import (
     route_decision
 )
 from config import settings
+from llm_client.client import LLMGatewayClient
 
 logger = logging.getLogger(__name__)
 
@@ -29,17 +29,13 @@ def create_workflow(mcp_client):
     """
     logger.info("Creating LangGraph workflow...")
     
-    # Initialize Bedrock LLM
-    llm = ChatBedrock(
-        model_id=settings.bedrock_model_id,
-        region_name=settings.aws_region,
-        model_kwargs={
-            "temperature": 0.0,
-            "max_tokens": 2000
-        }
+    # Initialize LLM Gateway client
+    llm_client = LLMGatewayClient(
+        gateway_url=settings.llm_gateway_url,
+        default_model=settings.default_model
     )
     
-    logger.info(f"Bedrock client initialized with model: {settings.bedrock_model_id}")
+    logger.info(f"LLM Gateway client initialized: url={settings.llm_gateway_url}, model={settings.default_model}")
     
     # Create graph
     graph = StateGraph(AgentState)
@@ -50,7 +46,7 @@ def create_workflow(mcp_client):
     
     # Add nodes
     graph.add_node("process_input", process_input_node)
-    graph.add_node("llm", lambda state: llm_node(state, llm, mcp_client))
+    graph.add_node("llm", lambda state: llm_node(state, llm_client, mcp_client))
     graph.add_node("tool_execution", tool_exec_wrapper)
     graph.add_node("final_answer", final_answer_node)
     

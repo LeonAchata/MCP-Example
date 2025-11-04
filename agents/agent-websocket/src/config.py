@@ -7,14 +7,12 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     """Agent settings."""
     
-    # MCP Server
+    # MCP Server (for tools)
     mcp_server_url: str = "http://toolbox:8000"
     
-    # AWS Bedrock
-    aws_region: str = "us-east-1"
-    aws_access_key_id: str
-    aws_secret_access_key: str
-    bedrock_model_id: str = "us.amazon.nova-pro-v1:0"
+    # LLM Gateway (for LLM calls)
+    llm_gateway_url: str = "http://llm-gateway:8003"
+    default_model: str = "bedrock-nova-pro"
     
     # Logging
     log_level: str = "DEBUG"
