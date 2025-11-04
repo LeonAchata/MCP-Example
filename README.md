@@ -656,6 +656,10 @@ curl -X POST http://localhost:8001/process \
 
 Este es un proyecto de aprendizaje personal.
 
+## Autor:
+
+Leon Achata
+
 ---
 
 **Happy coding! 🚀**
