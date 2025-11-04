@@ -126,12 +126,11 @@ async def tool_execution_node(state: Dict[str, Any], mcp_client) -> Dict[str, An
             # Call tool via MCP
             result = await mcp_client.call_tool(tool_name, tool_args)
             
-            # Create tool message with status for Bedrock
+            # Create tool message (sin status para compatibilidad con Bedrock)
             tool_message = ToolMessage(
                 content=str(result),
                 tool_call_id=tool_id,
-                name=tool_name,
-                status="success"
+                name=tool_name
             )
             tool_messages.append(tool_message)
             
@@ -146,12 +145,11 @@ async def tool_execution_node(state: Dict[str, Any], mcp_client) -> Dict[str, An
         except Exception as e:
             logger.error(f"Node: tool_execution | Error executing {tool_name}: {e}")
             
-            # Create error message with status
+            # Create error message (sin status)
             tool_message = ToolMessage(
                 content=f"Error: {str(e)}",
                 tool_call_id=tool_id,
-                name=tool_name,
-                status="error"
+                name=tool_name
             )
             tool_messages.append(tool_message)
             
