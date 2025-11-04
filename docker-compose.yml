@@ -21,11 +21,32 @@ services:
 
   agent:
     build:
-      context: ./agent
+      context: ./agents/agent-http
       dockerfile: Dockerfile
-    container_name: agent
+    container_name: agent-http
     ports:
       - "8001:8000"
+    environment:
+      - MCP_SERVER_URL=http://mcp-server:8000
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - BEDROCK_MODEL_ID=${BEDROCK_MODEL_ID}
+      - LOG_LEVEL=DEBUG
+    depends_on:
+      mcp-server:
+        condition: service_healthy
+    networks:
+      - mcp-network
+    restart: unless-stopped
+
+  agent-websocket:
+    build:
+      context: ./agents/agent-websocket
+      dockerfile: Dockerfile
+    container_name: agent-websocket
+    ports:
+      - "8002:8000"
     environment:
       - MCP_SERVER_URL=http://mcp-server:8000
       - AWS_REGION=${AWS_REGION}
