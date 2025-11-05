@@ -203,3 +203,8 @@ class MCPClient:
                 "input_schema": info["input_schema"]
             })
         return tools_desc
+    
+    async def close(self):
+        """Close the HTTP client connection."""
+        await self.client.aclose()
+        logger.info("MCP Client closed")

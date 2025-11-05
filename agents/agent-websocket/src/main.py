@@ -42,8 +42,8 @@ async def lifespan(app: FastAPI):
         
         logger.info("✅ WebSocket Agent started successfully")
         logger.info(f"MCP Toolbox: {settings.mcp_server_url}")
-        logger.info(f"Bedrock Model: {settings.bedrock_model_id}")
-        logger.info(f"AWS Region: {settings.aws_region}")
+        logger.info(f"LLM Gateway: {settings.llm_gateway_url}")
+        logger.info(f"Default Model: {settings.default_model}")
         
         yield
         
@@ -75,16 +75,17 @@ async def health_check():
         # Check MCP connection
         mcp_connected = mcp_client is not None and len(mcp_client.tools) > 0
         
-        # Check Bedrock (implicit - if we got here, config is loaded)
-        bedrock_available = bool(settings.bedrock_model_id)
+        # Check LLM Gateway availability
+        llm_gateway_available = bool(settings.llm_gateway_url and settings.default_model)
         
         return {
             "status": "healthy",
             "service": "websocket-agent",
             "mcp_connected": mcp_connected,
             "mcp_tools": len(mcp_client.tools) if mcp_client else 0,
-            "bedrock_available": bedrock_available,
-            "bedrock_model": settings.bedrock_model_id,
+            "llm_gateway_available": llm_gateway_available,
+            "llm_gateway_url": settings.llm_gateway_url,
+            "default_model": settings.default_model,
             "active_connections": manager.get_connection_count()
         }
     except Exception as e:
@@ -105,7 +106,8 @@ async def root():
         "health_check": "/health",
         "active_connections": manager.get_connection_count(),
         "mcp_toolbox": settings.mcp_server_url,
-        "bedrock_model": settings.bedrock_model_id
+        "llm_gateway": settings.llm_gateway_url,
+        "default_model": settings.default_model
     }
 
 
@@ -136,7 +138,8 @@ async def websocket_endpoint(websocket: WebSocket):
             "connection_id": connection_id,
             "message": "Conectado al WebSocket Agent",
             "mcp_tools": len(mcp_client.tools) if mcp_client else 0,
-            "bedrock_model": settings.bedrock_model_id
+            "llm_gateway": settings.llm_gateway_url,
+            "default_model": settings.default_model
         })
         
         # Message loop

@@ -64,7 +64,7 @@ async def lifespan(app: FastAPI):
 # Create FastAPI app
 app = FastAPI(
     title="LangGraph Agent with MCP",
-    description="Agent that uses LangGraph + Bedrock + MCP Server",
+    description="Agent that uses LangGraph + LLM Gateway + MCP Server",
     version="1.0.0",
     lifespan=lifespan
 )
