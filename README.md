@@ -1,27 +1,27 @@
 # 🤖 LangGraph Multi-Agent System + MCP + LLM Gateway
 
-Sistema multi-agente inteligente con **Model Context Protocol (MCP)**, **LLM Gateway centralizado** y soporte para múltiples proveedores de IA (AWS Bedrock, OpenAI, Google Gemini).
+Intelligent multi-agent system with **Model Context Protocol (MCP)**, **centralized LLM Gateway**, and support for multiple AI providers (AWS Bedrock, OpenAI, Google Gemini).
 
-## 📋 Descripción
+## 📋 Description
 
-Este proyecto implementa una arquitectura de microservicios para agentes de IA que:
-- 🧠 **LLM Gateway Centralizado**: Gestión unificada de múltiples proveedores de LLMs
-- 🔧 **MCP Toolbox**: Servidor de herramientas usando Model Context Protocol sobre HTTP
-- 🤖 **Múltiples Agentes**: HTTP REST y WebSocket para diferentes tipos de integración
-- 📊 **LangGraph**: Orquestación avanzada de flujos de trabajo
-- 🐳 **Containerizado**: Todo en Docker para fácil deployment
-- ☁️ **Production Ready**: Listo para Kubernetes/AWS EKS
+This project implements a microservices architecture for AI agents that:
+- 🧠 **Centralized LLM Gateway**: Unified management of multiple LLM providers
+- 🔧 **MCP Toolbox**: Tool server using Model Context Protocol over HTTP
+- 🤖 **Multiple Agents**: HTTP REST and WebSocket for different integration types
+- 📊 **LangGraph**: Advanced workflow orchestration
+- 🐳 **Containerized**: Everything in Docker for easy deployment
+- ☁️ **Production Ready**: Ready for Kubernetes/AWS EKS
 
-### 🎯 Características Principales
+### 🎯 Key Features
 
-- ✅ **Selección dinámica de modelos**: Cambia entre Bedrock, OpenAI y Gemini desde el prompt
-- ✅ **Cache inteligente**: Respuestas cacheadas con TTL configurable
-- ✅ **Métricas en tiempo real**: Tracking de costos, tokens y latencia
-- ✅ **Manejo de herramientas**: Ejecución de tools a través de MCP
-- ✅ **Streaming**: Soporte WebSocket para respuestas en tiempo real
-- ✅ **Health checks**: Monitoreo de salud de todos los servicios
+- ✅ **Dynamic model selection**: Switch between Bedrock, OpenAI, and Gemini from prompt
+- ✅ **Intelligent caching**: Cached responses with configurable TTL
+- ✅ **Real-time metrics**: Cost, token, and latency tracking
+- ✅ **Tool handling**: Tool execution through MCP
+- ✅ **Streaming**: WebSocket support for real-time responses
+- ✅ **Health checks**: Health monitoring for all services
 
-## 🏗️ Arquitectura
+## 🏗️ Architecture
 
 ```
                     ┌─────────────────────┐
@@ -34,8 +34,8 @@ Este proyecto implementa una arquitectura de microservicios para agentes de IA q
     ┌───────────────────────┐    ┌───────────────────────┐
     │  Agent WebSocket      │    │  Agent HTTP           │
     │  Port: 8002           │    │  Port: 8001           │
-    │  • Streaming real-time│    │  • REST API           │
-    │  • Múltiples clientes │    │  • Request/Response   │
+    │  • Real-time streaming│    │  • REST API           │
+    │  • Multiple clients   │    │  • Request/Response   │
     │  • FastAPI + WS       │    │  • FastAPI            │
     │  • LangGraph          │    │  • LangGraph          │
     └───────────┬───────────┘    └───────────┬───────────┘
@@ -62,183 +62,174 @@ Este proyecto implementa una arquitectura de microservicios para agentes de IA q
         Docker Network (mcp-network)
 ```
 
-## 🔧 Componentes
+## 🔧 Components
 
-### 1. 🧠 LLM Gateway (Puerto 8003)
-**Servidor centralizado de gestión de LLMs**
+### 1. 🧠 LLM Gateway (Port 8003)
+**Centralized LLM management server**
 
-- **Propósito**: Abstrae y unifica el acceso a múltiples proveedores de IA
-- **Proveedores soportados**:
+- **Purpose**: Abstracts and unifies access to multiple AI providers
+- **Supported providers**:
   - AWS Bedrock Nova Pro (`bedrock-nova-pro`)
   - OpenAI GPT-4o (`gpt-4o`)
   - Google Gemini 1.5 Flash (`gemini-pro`)
-- **Características**:
-  - 💰 **Cálculo de costos**: Estima costos por request
-  - 🚀 **Cache TTL**: Reduce llamadas a APIs externas
-  - 📊 **Métricas**: Requests, tokens, latencia, hit rate
-  - 🔌 **Patrón Registry**: Fácil agregar nuevos LLMs
-  - 🔐 **Credenciales centralizadas**: Los agentes no necesitan API keys
+- **Features**:
+  - 💰 **Cost calculation**: Estimates costs per request
+  - 🚀 **TTL Cache**: Reduces external API calls
+  - 📊 **Metrics**: Requests, tokens, latency, hit rate
+  - 🔌 **Registry pattern**: Easy to add new LLMs
+  - 🔐 **Centralized credentials**: Agents don't need API keys
 
 **Endpoints**:
-- `GET /mcp/llm/list` - Lista modelos disponibles
-- `POST /mcp/llm/generate` - Genera respuesta con modelo seleccionado
-- `GET /metrics` - Obtiene métricas del gateway
-- `POST /cache/clear` - Limpia el cache
+- `GET /mcp/llm/list` - List available models
+- `POST /mcp/llm/generate` - Generate response with selected model
+- `GET /metrics` - Get gateway metrics
+- `POST /cache/clear` - Clear cache
 
-### 2. 🛠️ MCP Toolbox (Puerto 8000)
-**Servidor de herramientas con Model Context Protocol**
+### 2. 🛠️ MCP Toolbox (Port 8000)
+**Tool server with Model Context Protocol**
 
-- **Protocolo**: MCP sobre HTTP REST
-- **4 Herramientas**:
-  - `add(a, b)` - Suma dos números
-  - `multiply(a, b)` - Multiplica dos números
-  - `uppercase(text)` - Convierte texto a mayúsculas
-  - `count_words(text)` - Cuenta palabras en un texto
+- **Protocol**: MCP over HTTP REST
+- **4 Tools**:
+  - `add(a, b)` - Add two numbers
+  - `multiply(a, b)` - Multiply two numbers
+  - `uppercase(text)` - Convert text to uppercase
+  - `count_words(text)` - Count words in text
 
 **Endpoints**:
-- `GET /mcp/tools/list` - Lista herramientas disponibles
-- `POST /mcp/tools/call` - Ejecuta una herramienta
+- `GET /mcp/tools/list` - List available tools
+- `POST /mcp/tools/call` - Execute a tool
 
-### 3. 🤖 Agent HTTP (Puerto 8001)
-**Agente con API REST**
+### 3. 🤖 Agent HTTP (Port 8001)
+**Agent with REST API**
 
 - **Framework**: FastAPI + LangGraph
-- **Tipo**: Request/Response tradicional
-- **Uso**: Integraciones síncronas, APIs externas
-- **Características**:
-  - Selección de modelo por request
-  - Detección automática de modelo en prompt
-  - Tracking de pasos de ejecución
+- **Type**: Traditional request/response
+- **Use**: Synchronous integrations, external APIs
+- **Features**:
+  - Model selection per request
+  - Automatic model detection from prompt
+  - Execution step tracking
 
 **Endpoint**:
 ```bash
 POST /process
 {
-  "input": "usa gemini, cuanto es 5 + 3",
-  "model": "gemini-pro"  # Opcional
+  "input": "use gemini, how much is 5 + 3",
+  "model": "gemini-pro"  # Optional
 }
 ```
 
-### 4. 🔌 Agent WebSocket (Puerto 8002)
-**Agente con comunicación en tiempo real**
+### 4. 🔌 Agent WebSocket (Port 8002)
+**Agent with real-time communication**
 
 - **Framework**: FastAPI WebSocket + LangGraph
-- **Tipo**: Streaming bidireccional
-- **Uso**: Interfaces conversacionales, dashboards
-- **Características**:
-  - Múltiples clientes concurrentes
-  - Streaming de pasos de ejecución
-  - Notificaciones en tiempo real
+- **Type**: Bidirectional streaming
+- **Use**: Conversational interfaces, dashboards
+- **Features**:
+  - Multiple concurrent clients
+  - Execution step streaming
+  - Real-time notifications
 
-**Conexión**:
+**Connection**:
 ```javascript
 ws://localhost:8002/ws/{connection_id}
 ```
 
-## 📁 Estructura del Proyecto
+## 📁 Project Structure
 
 ```
 MCP-Example/
-├── llm-gateway/                     # 🧠 LLM Gateway (NUEVO)
+├── llm-gateway/                     # 🧠 LLM Gateway (NEW)
 │   ├── src/
-│   │   ├── models/                 # Implementaciones LLM
-│   │   │   ├── base.py            # Clase abstracta
+│   │   ├── models/                 # LLM implementations
+│   │   │   ├── base.py            # Abstract class
 │   │   │   ├── bedrock.py         # AWS Bedrock
 │   │   │   ├── openai.py          # OpenAI GPT-4
 │   │   │   └── gemini.py          # Google Gemini
-│   │   ├── cache.py               # Sistema de cache TTL
-│   │   ├── metrics.py             # Métricas y tracking
-│   │   ├── registry.py            # Registry de LLMs
-│   │   ├── config.py              # Configuración
-│   │   └── server.py              # FastAPI server MCP
+│   │   ├── cache.py               # TTL cache system
+│   │   ├── metrics.py             # Metrics and tracking
+│   │   ├── registry.py            # LLM registry
+│   │   ├── config.py              # Configuration
+│   │   └── server.py              # FastAPI MCP server
 │   ├── Dockerfile
 │   └── requirements.txt
 │
-├── agents/                          # Agentes del sistema
-│   ├── agent-http/                  # Agent REST API
+├── agents/                          # System agents
+│   ├── agent-http/                  # REST API Agent
 │   │   ├── src/
 │   │   │   ├── graph/              # LangGraph workflow
-│   │   │   │   ├── nodes.py        # Nodos del grafo
-│   │   │   │   ├── state.py        # Estado del agente
-│   │   │   │   └── workflow.py     # Definición del workflow
-│   │   │   ├── llm_client/         # Cliente LLM Gateway (NUEVO)
-│   │   │   ├── mcp_client/         # Cliente MCP Toolbox
+│   │   │   │   ├── nodes.py        # Graph nodes
+│   │   │   │   ├── state.py        # Agent state
+│   │   │   │   └── workflow.py     # Workflow definition
+│   │   │   ├── llm_client/         # LLM Gateway client (NEW)
+│   │   │   ├── mcp_client/         # MCP Toolbox client
 │   │   │   ├── api/                # FastAPI routes
-│   │   │   ├── config.py           # Configuración
+│   │   │   ├── config.py           # Configuration
 │   │   │   └── main.py             # Entry point
 │   │   ├── Dockerfile
 │   │   └── requirements.txt
 │   │
-│   └── agent-websocket/             # Agent WebSocket
+│   └── agent-websocket/             # WebSocket Agent
 │       ├── src/
 │       │   ├── graph/              # LangGraph workflow
-│       │   ├── llm_client/         # Cliente LLM Gateway (NUEVO)
-│       │   ├── mcp_client/         # Cliente MCP Toolbox
+│       │   ├── llm_client/         # LLM Gateway client (NEW)
+│       │   ├── mcp_client/         # MCP Toolbox client
 │       │   ├── websocket/          # WebSocket handlers
-│       │   ├── config.py           # Configuración
+│       │   ├── config.py           # Configuration
 │       │   └── main.py             # Entry point
 │       ├── Dockerfile
 │       └── requirements.txt
 │
 ├── mcp-server/                      # MCP Toolbox Server
 │   ├── src/
-│   │   ├── tools/                  # 4 herramientas
+│   │   ├── tools/                  # 4 tools
 │   │   │   ├── calculator.py
 │   │   │   └── text_tools.py
-│   │   ├── server.py               # MCP server HTTP
-│   │   └── config.py
-│   ├── Dockerfile
-│   └── requirements.txt
-│   │   ├── server.py               # MCP server HTTP
-│   │   └── config.py               # Configuración
+│   │   ├── server.py               # HTTP MCP server
+│   │   └── config.py               # Configuration
 │   ├── Dockerfile
 │   └── requirements.txt
 │
-├── k8s/                             # Manifiestos Kubernetes
+├── k8s/                             # Kubernetes manifests
 │   ├── namespace.yaml
-│   ├── mcp-toolbox-*.yaml
-│
-├── frontend/                        # Interfaz web (opcional)
-├── k8s/                             # Manifiestos Kubernetes
-│   ├── namespace.yaml
-│   ├── llm-gateway-*.yaml          # Deployment LLM Gateway
+│   ├── llm-gateway-*.yaml          # LLM Gateway deployment
 │   ├── mcp-toolbox-*.yaml
 │   ├── agent-*.yaml
 │   ├── websocket-agent-*.yaml
 │   └── ingress.yaml
 │
-├── docs/                            # Documentación
-│   ├── DEPLOYMENT_EKS.md           # Guía AWS EKS
-│   └── WEBSOCKET_AGENT.md          # Docs WebSocket
+├── docs/                            # Documentation
+│   ├── DEPLOYMENT_EKS.md           # AWS EKS guide
+│   └── WEBSOCKET_AGENT.md          # WebSocket docs
 │
-├── docker-compose.yml               # Orquestación Docker
-├── test-websocket.html              # Cliente HTML WebSocket
-├── .env                             # Variables de entorno (NO SUBIR)
+├── docker-compose.yml               # Docker orchestration
+├── test-websocket.html              # WebSocket HTML client
+├── .env                             # Environment variables (DO NOT COMMIT)
 └── README.md
 ```
 
-## 🚀 Instalación y Uso
+## 🚀 Installation and Usage
 
-### Prerrequisitos
+### Prerequisites
 
-- Docker y Docker Compose instalados
-- **Credenciales de al menos uno de:**
-  - AWS (para Bedrock Nova Pro)
-  - OpenAI (para GPT-4o)
-  - Google Cloud (para Gemini)
+- Docker and Docker Compose installed
+- **Credentials for at least one of:**
+  - AWS (for Bedrock Nova Pro)
+  - OpenAI (for GPT-4o)
+  - Google Cloud (for Gemini)
 
-### Configuración
+### Configuration
 
-1. **Clona el repositorio**
+1. **Clone the repository**
 
 ```bash
 git clone https://github.com/LeonAchata/MCP-Server-Prueba.git
 cd MCP-Example
 ```
 
-2. **Configura las variables de entorno**
+2. **Configure environment variables**
 
-Crea el archivo `.env` en la raíz del proyecto:
+Create `.env` file in project root:
 
 ```bash
 # LLM Gateway Configuration
@@ -251,17 +242,17 @@ CACHE_ENABLED=true
 CACHE_TTL=3600
 CACHE_MAX_SIZE=1000
 
-# AWS Bedrock Credentials (Opcional)
+# AWS Bedrock Credentials (Optional)
 AWS_REGION=us-east-1
-AWS_ACCESS_KEY_ID=tu_access_key
-AWS_SECRET_ACCESS_KEY=tu_secret_key
+AWS_ACCESS_KEY_ID=your_access_key
+AWS_SECRET_ACCESS_KEY=your_secret_key
 BEDROCK_MODEL_ID=us.amazon.nova-pro-v1:0
 
-# OpenAI Credentials (Opcional)
+# OpenAI Credentials (Optional)
 OPENAI_API_KEY=sk-proj-...
 OPENAI_DEFAULT_MODEL=gpt-4o
 
-# Google Gemini Credentials (Opcional)
+# Google Gemini Credentials (Optional)
 GOOGLE_API_KEY=AIzaSy...
 GEMINI_DEFAULT_MODEL=gemini-1.5-flash
 
@@ -270,47 +261,47 @@ MCP_SERVER_URL=http://toolbox:8000
 LLM_GATEWAY_URL=http://llm-gateway:8003
 ```
 
-**⚠️ Notas importantes:**
-- Configura al menos un proveedor de LLM (Bedrock, OpenAI o Gemini)
-- Si usas AWS, asegúrate de tener acceso a Bedrock Nova Pro en tu región
-- Para OpenAI, necesitas créditos en tu cuenta
-- Para Gemini, habilita la API en Google Cloud Console
+**⚠️ Important notes:**
+- Configure at least one LLM provider (Bedrock, OpenAI or Gemini)
+- If using AWS, ensure you have Bedrock Nova Pro access in your region
+- For OpenAI, you need credits in your account
+- For Gemini, enable the API in Google Cloud Console
 
-### Ejecución
+### Execution
 
-**Construir e iniciar todos los contenedores:**
+**Build and start all containers:**
 
 ```bash
 docker-compose up --build -d
 ```
 
-El sistema iniciará 4 servicios:
-- 🧠 **LLM Gateway** en `http://localhost:8003`
-- 🔧 **MCP Toolbox** en `http://localhost:8000` (interno)
-- 📡 **Agent HTTP** en `http://localhost:8001`
-- 🔌 **Agent WebSocket** en `http://localhost:8002`
+The system will start 4 services:
+- 🧠 **LLM Gateway** at `http://localhost:8003`
+- 🔧 **MCP Toolbox** at `http://localhost:8000` (internal)
+- 📡 **Agent HTTP** at `http://localhost:8001`
+- 🔌 **Agent WebSocket** at `http://localhost:8002`
 
-**Ver logs en tiempo real:**
+**View logs in real-time:**
 ```bash
-# Todos los servicios
+# All services
 docker-compose logs -f
 
-# Servicio específico
+# Specific service
 docker-compose logs -f llm-gateway
 docker-compose logs -f agent-http
 ```
 
-**Verificar estado de los servicios:**
+**Check service status:**
 ```bash
 docker-compose ps
 ```
 
-**Detener el sistema:**
+**Stop the system:**
 ```bash
 docker-compose down
 ```
 
-**Reconstruir un servicio específico:**
+**Rebuild a specific service:**
 ```bash
 docker-compose build llm-gateway
 docker-compose up -d llm-gateway
@@ -321,18 +312,18 @@ docker-compose up -d llm-gateway
 ### 🧠 LLM Gateway (Port 8003)
 
 #### GET /health
-Verifica el estado del gateway:
+Check gateway status:
 ```bash
 curl http://localhost:8003/health
 ```
 
 #### GET /mcp/llm/list
-Lista todos los modelos disponibles:
+List all available models:
 ```bash
 curl -X GET http://localhost:8003/mcp/llm/list
 ```
 
-Respuesta:
+Response:
 ```json
 {
   "llms": [
@@ -356,7 +347,7 @@ Respuesta:
 ```
 
 #### POST /mcp/llm/generate
-Genera una respuesta con el modelo especificado:
+Generate response with specified model:
 ```bash
 curl -X POST http://localhost:8003/mcp/llm/generate \
   -H "Content-Type: application/json" \
@@ -371,12 +362,12 @@ curl -X POST http://localhost:8003/mcp/llm/generate \
 ```
 
 #### GET /metrics
-Obtiene métricas del gateway:
+Get gateway metrics:
 ```bash
 curl http://localhost:8003/metrics
 ```
 
-Respuesta:
+Response:
 ```json
 {
   "total_requests": 42,
@@ -393,7 +384,7 @@ Respuesta:
 ```
 
 #### POST /cache/clear
-Limpia el cache:
+Clear cache:
 ```bash
 curl -X POST http://localhost:8003/cache/clear
 ```
@@ -405,7 +396,7 @@ curl -X POST http://localhost:8003/cache/clear
 curl http://localhost:8000/health
 ```
 
-Respuesta:
+Response:
 ```json
 {
   "status": "healthy",
@@ -416,13 +407,13 @@ Respuesta:
 ```
 
 #### POST /mcp/tools/list
-Lista todas las herramientas disponibles:
+List all available tools:
 ```bash
 curl -X POST http://localhost:8000/mcp/tools/list
 ```
 
 #### POST /mcp/tools/call
-Ejecuta una herramienta:
+Execute a tool:
 ```bash
 curl -X POST http://localhost:8000/mcp/tools/call \
   -H "Content-Type: application/json" \
@@ -432,13 +423,13 @@ curl -X POST http://localhost:8000/mcp/tools/call \
 ### 🤖 Agent HTTP - REST API (Port 8001)
 
 #### GET /health
-Verifica el estado del agente:
+Check agent status:
 
 ```bash
 curl http://localhost:8001/health
 ```
 
-Respuesta:
+Response:
 ```json
 {
   "status": "healthy",
@@ -448,50 +439,50 @@ Respuesta:
 ```
 
 #### POST /process
-Procesa una query usando el agente con LangGraph.
+Process a query using the agent with LangGraph.
 
-**Sintaxis básica:**
+**Basic syntax:**
 ```bash
 curl -X POST http://localhost:8001/process \
   -H "Content-Type: application/json" \
   -d '{
-    "input": "¿Cuánto es 5 + 3?",
+    "input": "How much is 5 + 3?",
     "model": "bedrock-nova-pro"
   }'
 ```
 
-**Ejemplo 1: Suma con Bedrock (default)**
+**Example 1: Addition with Bedrock (default)**
 ```bash
 curl -X POST http://localhost:8001/process \
   -H "Content-Type: application/json" \
-  -d '{"input": "¿Cuánto es 5 + 3?"}'
+  -d '{"input": "How much is 5 + 3?"}'
 ```
 
-**Ejemplo 2: Con Gemini (especificado)**
+**Example 2: With Gemini (specified)**
 ```bash
 curl -X POST http://localhost:8001/process \
   -H "Content-Type: application/json" \
-  -d '{"input": "Multiplica 7 por 8", "model": "gemini-pro"}'
+  -d '{"input": "Multiply 7 by 8", "model": "gemini-pro"}'
 ```
 
-**Ejemplo 3: Detección automática de modelo**
+**Example 3: Automatic model detection**
 ```bash
 curl -X POST http://localhost:8001/process \
   -H "Content-Type: application/json" \
-  -d '{"input": "usa gemini, convierte HELLO a mayúsculas"}'
+  -d '{"input": "use gemini, convert HELLO to uppercase"}'
 ```
 
-**Ejemplo 4: Operaciones complejas**
+**Example 4: Complex operations**
 ```bash
 curl -X POST http://localhost:8001/process \
   -H "Content-Type: application/json" \
-  -d '{"input": "Multiplica 25 por 8, luego convierte el resultado a texto en mayúsculas"}'
+  -d '{"input": "Multiply 25 by 8, then convert the result to uppercase text"}'
 ```
 
-**Con PowerShell:**
+**With PowerShell:**
 ```powershell
 $body = @{
-    input = "usa gemini, cuanto es 10 + 5"
+    input = "use gemini, how much is 10 + 5"
 } | ConvertTo-Json
 
 Invoke-WebRequest -Uri "http://localhost:8001/process" `
@@ -500,15 +491,15 @@ Invoke-WebRequest -Uri "http://localhost:8001/process" `
   -ContentType "application/json"
 ```
 
-Respuesta:
+Response:
 ```json
 {
-  "result": "La suma de 5 y 3 es 8",
+  "result": "The sum of 5 and 3 is 8",
   "steps": [
     {
       "node": "process_input",
       "timestamp": "2024-11-03T19:00:00",
-      "input": "¿Cuánto es 5 + 3?",
+      "input": "How much is 5 + 3?",
       "model_selected": "bedrock-nova-pro"
     },
     {
@@ -535,29 +526,29 @@ Respuesta:
 }
 ```
 
-**Modelos disponibles:**
+**Available models:**
 - `bedrock-nova-pro` - AWS Bedrock Nova Pro (default)
 - `gpt-4o` - OpenAI GPT-4o
 - `gemini-pro` - Google Gemini 1.5 Flash
 
-**Detección automática:**
-El agente puede detectar el modelo desde el prompt con palabras clave:
-- "usa openai", "use gpt", "con gpt-4" → OpenAI
-- "usa gemini", "use google", "con gemini" → Gemini
-- "usa bedrock", "use nova", "con aws" → Bedrock
+**Automatic detection:**
+The agent can detect the model from the prompt with keywords:
+- "use openai", "use gpt", "with gpt-4" → OpenAI
+- "use gemini", "use google", "with gemini" → Gemini
+- "use bedrock", "use nova", "with aws" → Bedrock
 
 ---
 
 ### 🔌 Agent WebSocket - Real-time Streaming (Port 8002)
 
 #### GET /health
-Verifica el estado del agente WebSocket:
+Check WebSocket agent status:
 
 ```bash
 curl http://localhost:8002/health
 ```
 
-Respuesta:
+Response:
 ```json
 {
   "status": "healthy",
@@ -569,48 +560,48 @@ Respuesta:
 ```
 
 #### WebSocket /ws/{connection_id}
-Conexión WebSocket para comunicación en tiempo real con streaming de respuestas.
+WebSocket connection for real-time communication with response streaming.
 
-**Usando el cliente HTML:**
-1. Abre `test-websocket.html` en tu navegador
-2. La conexión se establece automáticamente
-3. Escribe mensajes como:
-   - "Suma 10 y 5"
-   - "usa gemini, multiplica 25 por 8"
-   - "Convierte HOLA a mayúsculas"
+**Using the HTML client:**
+1. Open `test-websocket.html` in your browser
+2. Connection establishes automatically
+3. Type messages like:
+   - "Add 10 and 5"
+   - "use gemini, multiply 25 by 8"
+   - "Convert HELLO to uppercase"
 
-**Mensaje con modelo específico:**
+**Message with specific model:**
 ```javascript
 {
   "type": "message",
-  "content": "Suma 100 y 50",
-  "model": "gemini-pro"  // Opcional
+  "content": "Add 100 and 50",
+  "model": "gemini-pro"  // Optional
 }
 ```
 
-**Usando JavaScript:**
+**Using JavaScript:**
 ```javascript
 const connectionId = 'user-' + Date.now();
 const ws = new WebSocket(`ws://localhost:8002/ws/${connectionId}`);
 
 ws.onopen = () => {
-    console.log('Conectado');
+    console.log('Connected');
     
-    // Enviar mensaje con modelo específico
+    // Send message with specific model
     ws.send(JSON.stringify({
         type: 'message',
-        content: 'usa gemini, suma 100 y 50',
-        model: 'gemini-pro'  // Opcional, también detecta del texto
+        content: 'use gemini, add 100 and 50',
+        model: 'gemini-pro'  // Optional, also detects from text
     }));
 };
 
 ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    console.log('Recibido:', data);
+    console.log('Received:', data);
     
     switch(data.type) {
         case 'connected':
-            console.log('✅ Conectado:', data.message);
+            console.log('✅ Connected:', data.message);
             break;
         case 'start':
             console.log('🚀', data.message);
@@ -618,20 +609,20 @@ ws.onmessage = (event) => {
         case 'step':
             console.log(`⚙️ ${data.node}:`, data.message);
             if (data.model) {
-                console.log('  🧠 Modelo:', data.model);
+                console.log('  🧠 Model:', data.model);
             }
             break;
         case 'tool_call':
-            console.log('🔧 Llamando:', data.tool, data.args);
+            console.log('🔧 Calling:', data.tool, data.args);
             break;
         case 'tool_result':
-            console.log('✅ Resultado:', data.tool, '→', data.result);
+            console.log('✅ Result:', data.tool, '→', data.result);
             break;
         case 'response':
-            console.log('🤖 Respuesta:', data.content);
+            console.log('🤖 Response:', data.content);
             break;
         case 'complete':
-            console.log('✓ Completado en', data.steps, 'pasos');
+            console.log('✓ Completed in', data.steps, 'steps');
             break;
         case 'error':
             console.error('❌ Error:', data.message);
@@ -640,44 +631,43 @@ ws.onmessage = (event) => {
 };
 
 ws.onerror = (error) => console.error('Error:', error);
-ws.onclose = () => console.log('Desconectado');
+ws.onclose = () => console.log('Disconnected');
 ```
 
-**Usando wscat (Node.js):**
+**Using wscat (Node.js):**
 ```bash
 npm install -g wscat
 wscat -c ws://localhost:8002/ws/test-client
 
-# Enviar mensaje
-> {"type":"message","content":"usa gemini, suma 10 y 5"}
+# Send message
+> {"type":"message","content":"use gemini, add 10 and 5"}
 
-# Recibirás streaming en tiempo real:
-< {"type":"start","message":"Procesando..."}
+# You'll receive real-time streaming:
+< {"type":"start","message":"Processing..."}
 < {"type":"step","node":"process_input","model":"gemini-pro"}
-< {"type":"step","node":"llm","model":"gemini-pro","message":"Consultando LLM..."}
+< {"type":"step","node":"llm","model":"gemini-pro","message":"Querying LLM..."}
 < {"type":"tool_call","tool":"add","args":{"a":10,"b":5}}
 < {"type":"tool_result","tool":"add","result":"15"}
-< {"type":"response","content":"La suma de 10 y 5 es 15"}
+< {"type":"response","content":"The sum of 10 and 5 is 15"}
 < {"type":"complete","steps":5}
 ```
-```
 
-**Usando Python:**
+**Using Python:**
 ```python
 import asyncio
 import websockets
 import json
 
 async def test_websocket():
-    uri = "ws://localhost:8002/ws"
+    uri = "ws://localhost:8002/ws/test-123"
     async with websockets.connect(uri) as websocket:
-        # Enviar mensaje
+        # Send message
         await websocket.send(json.dumps({
             "type": "message",
-            "content": "Suma 10 y 5"
+            "content": "Add 10 and 5"
         }))
         
-        # Recibir respuestas en streaming
+        # Receive streaming responses
         while True:
             response = await websocket.recv()
             data = json.loads(response)
@@ -689,148 +679,148 @@ async def test_websocket():
 asyncio.run(test_websocket())
 ```
 
-## 🛠️ Herramientas Disponibles
+## 🛠️ Available Tools
 
-El MCP Server expone 4 herramientas que Claude puede usar:
+The MCP Server exposes 4 tools that Claude can use:
 
-| Herramienta | Descripción | Parámetros |
-|-------------|-------------|------------|
-| `add` | Suma dos números | `a: float, b: float` |
-| `multiply` | Multiplica dos números | `a: float, b: float` |
-| `uppercase` | Convierte texto a mayúsculas | `text: string` |
-| `count_words` | Cuenta palabras en un texto | `text: string` |
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `add` | Add two numbers | `a: float, b: float` |
+| `multiply` | Multiply two numbers | `a: float, b: float` |
+| `uppercase` | Convert text to uppercase | `text: string` |
+| `count_words` | Count words in text | `text: string` |
 
-## 💡 Ejemplos de Uso Completos
+## 💡 Complete Usage Examples
 
-### 🧠 Selección de Modelos LLM
+### 🧠 LLM Model Selection
 
-**Modelo por defecto (Bedrock):**
+**Default model (Bedrock):**
 ```bash
 curl -X POST http://localhost:8001/process \
   -H "Content-Type: application/json" \
-  -d '{"input": "Suma 10 y 5"}'
+  -d '{"input": "Add 10 and 5"}'
 ```
 
-**Especificando modelo explícitamente:**
+**Explicitly specifying model:**
 ```bash
-# Con Gemini
+# With Gemini
 curl -X POST http://localhost:8001/process \
   -H "Content-Type: application/json" \
-  -d '{"input": "Multiplica 7 por 8", "model": "gemini-pro"}'
+  -d '{"input": "Multiply 7 by 8", "model": "gemini-pro"}'
 
-# Con OpenAI (si tienes créditos)
+# With OpenAI (if you have credits)
 curl -X POST http://localhost:8001/process \
   -H "Content-Type: application/json" \
-  -d '{"input": "Cuenta las palabras en: hola mundo", "model": "gpt-4o"}'
+  -d '{"input": "Count words in: hello world", "model": "gpt-4o"}'
 ```
 
-**Detección automática desde el prompt:**
+**Automatic detection from prompt:**
 ```bash
-# Detecta Gemini
+# Detects Gemini
 curl -X POST http://localhost:8001/process \
   -H "Content-Type: application/json" \
-  -d '{"input": "usa gemini, cuanto es 15 + 25"}'
+  -d '{"input": "use gemini, how much is 15 + 25"}'
 
-# Detecta OpenAI
+# Detects OpenAI
 curl -X POST http://localhost:8001/process \
   -H "Content-Type: application/json" \
-  -d '{"input": "con gpt-4, convierte HELLO a mayúsculas"}'
+  -d '{"input": "with gpt-4, convert HELLO to uppercase"}'
 
-# Detecta Bedrock
+# Detects Bedrock
 curl -X POST http://localhost:8001/process \
   -H "Content-Type: application/json" \
-  -d '{"input": "usa bedrock, multiplica 3 por 9"}'
+  -d '{"input": "use bedrock, multiply 3 by 9"}'
 ```
 
 ### 📡 HTTP REST Agent
 
-**Matemáticas básicas:**
+**Basic math:**
 ```bash
 curl -X POST http://localhost:8001/process \
   -H "Content-Type: application/json" \
-  -d '{"input": "Calcula 10 multiplicado por 5"}'
+  -d '{"input": "Calculate 10 multiplied by 5"}'
 ```
 
-**Procesamiento de texto:**
+**Text processing:**
 ```bash
 curl -X POST http://localhost:8001/process \
   -H "Content-Type: application/json" \
-  -d '{"input": "Convierte hello world a mayúsculas"}'
+  -d '{"input": "Convert hello world to uppercase"}'
 ```
 
-**Combinación de herramientas:**
+**Tool combination:**
 ```bash
 curl -X POST http://localhost:8001/process \
   -H "Content-Type: application/json" \
-  -d '{"input": "Suma 4 y 6, luego multiplica el resultado por 2"}'
+  -d '{"input": "Add 4 and 6, then multiply the result by 2"}'
 ```
 
-**Con PowerShell:**
+**With PowerShell:**
 ```powershell
-# Suma con Bedrock
-$body = '{"input":"Suma 100 y 50"}'
+# Addition with Bedrock
+$body = '{"input":"Add 100 and 50"}'
 Invoke-WebRequest -Uri "http://localhost:8001/process" -Method POST -Body $body -ContentType "application/json"
 
-# Multiplicación con Gemini
-$body = '{"input":"usa gemini, multiplica 25 por 8"}'
+# Multiplication with Gemini
+$body = '{"input":"use gemini, multiply 25 by 8"}'
 Invoke-WebRequest -Uri "http://localhost:8001/process" -Method POST -Body $body -ContentType "application/json"
 
-# Texto
-$body = '{"input":"Convierte HOLA MUNDO a mayúsculas y cuenta las palabras"}'
+# Text
+$body = '{"input":"Convert HELLO WORLD to uppercase and count the words"}'
 Invoke-WebRequest -Uri "http://localhost:8001/process" -Method POST -Body $body -ContentType "application/json"
 ```
 
 ### 🔌 WebSocket Agent
 
-**Usando el cliente HTML (Recomendado):**
-1. Abre el archivo `test-websocket.html` en tu navegador
-2. Verás una interfaz bonita con el estado de conexión
-3. Escribe en el input y presiona Enter o clic en "Enviar"
-4. Observa el streaming en tiempo real de cada paso
-5. Los steps mostrarán el modelo usado (en el campo `model`)
+**Using the HTML client (Recommended):**
+1. Open `test-websocket.html` in your browser
+2. You'll see a nice interface with connection status
+3. Type in the input and press Enter or click "Send"
+4. Watch real-time streaming of each step
+5. Steps will show the model used (in the `model` field)
 
-**Ejemplos de mensajes:**
-- "Suma 10 y 5"
-- "usa gemini, multiplica 7 por 8"
-- "con gpt-4, convierte HELLO a mayúsculas"
-- "usa bedrock, cuenta palabras en: el cielo es azul"
+**Example messages:**
+- "Add 10 and 5"
+- "use gemini, multiply 7 by 8"
+- "with gpt-4, convert HELLO to uppercase"
+- "use bedrock, count words in: the sky is blue"
 
-**Pruebas desde línea de comandos:**
+**Testing from command line:**
 ```bash
-# Instalar wscat
+# Install wscat
 npm install -g wscat
 
-# Conectar
+# Connect
 wscat -c ws://localhost:8002/ws/test-123
 
-# Probar diferentes comandos:
-> {"type":"message","content":"Suma 10 y 5"}
-> {"type":"message","content":"usa gemini, multiplica 100 por 2"}
-> {"type":"message","content":"Convierte python a mayúsculas","model":"gemini-pro"}
-> {"type":"message","content":"Cuenta las palabras en: El MCP es genial"}
+# Try different commands:
+> {"type":"message","content":"Add 10 and 5"}
+> {"type":"message","content":"use gemini, multiply 100 by 2"}
+> {"type":"message","content":"Convert python to uppercase","model":"gemini-pro"}
+> {"type":"message","content":"Count words in: MCP is awesome"}
 ```
 
-### 🧪 Verificar Métricas del LLM Gateway
+### 🧪 Check LLM Gateway Metrics
 
 ```bash
-# Ver métricas actuales
+# View current metrics
 curl http://localhost:8003/metrics
 
-# Limpiar cache
+# Clear cache
 curl -X POST http://localhost:8003/cache/clear
 
-# Listar modelos disponibles
+# List available models
 curl http://localhost:8003/mcp/llm/list
 ```
 
-## 🔍 Logs y Debugging
+## 🔍 Logs and Debugging
 
-**Ver todos los logs en tiempo real:**
+**View all logs in real-time:**
 ```bash
 docker-compose logs -f
 ```
 
-**Ver logs de un servicio específico:**
+**View specific service logs:**
 ```bash
 docker-compose logs -f llm-gateway
 docker-compose logs -f agent-http
@@ -838,128 +828,124 @@ docker-compose logs -f agent-websocket
 docker-compose logs -f toolbox
 ```
 
-**Ver últimas 50 líneas:**
+**View last 50 lines:**
 ```bash
 docker-compose logs --tail 50 agent-http
 ```
 
-**Buscar errores en PowerShell:**
+**Search for errors in PowerShell:**
 ```powershell
 docker-compose logs agent-http | Select-String -Pattern "error|Error|ERROR"
 ```
 
-**Los logs muestran:**
-- ✅ Inicialización del LLM Gateway con 3 proveedores
-- ✅ Conexión MCP client ↔ servers
-- ✅ Discovery de herramientas (4 tools)
-- ✅ Selección de modelo (Bedrock/OpenAI/Gemini)
-- ✅ Llamadas a LLMs con cache hit/miss
-- ✅ Ejecución de herramientas via MCP
-- ✅ Métricas de costos y tokens
-- ✅ Conexiones WebSocket activas
-- ✅ Streaming de mensajes en tiempo real
+**Logs show:**
+- ✅ LLM Gateway initialization with 3 providers
+- ✅ MCP client ↔ servers connection
+- ✅ Tool discovery (4 tools)
+- ✅ Model selection (Bedrock/OpenAI/Gemini)
+- ✅ LLM calls with cache hit/miss
+- ✅ Tool execution via MCP
+- ✅ Cost and token metrics
+- ✅ Active WebSocket connections
+- ✅ Real-time message streaming
 
-## 🛑 Detener el Sistema
+## 🛑 Stop the System
 
 ```bash
 docker-compose down
 ```
 
-## 🔧 Desarrollo
+## 🔧 Development
 
-### Reconstruir después de cambios
+### Rebuild after changes
 
 ```bash
 docker-compose up --build
 ```
 
-### Ver logs de un servicio específico
+### View specific service logs
 
 ```bash
 docker-compose logs -f agent
 docker-compose logs -f mcp-server
 ```
 
-## 📚 Tecnologías
+## 📚 Technologies
 
 - **Python 3.11** - Runtime
-- **FastAPI** - Framework web para REST y WebSocket
-- **LangGraph** - Orquestación de workflows con grafos
-- **LangChain** - Framework para LLM
-- **Amazon Bedrock** - Nova Pro (modelo LLM)
-- **MCP (Model Context Protocol)** - Protocolo de herramientas sobre HTTP REST
-- **WebSocket** - Comunicación bidireccional en tiempo real
-- **Docker & Docker Compose** - Containerización y orquestación
-- **httpx** - Cliente HTTP asíncrono
-- **boto3** - SDK de AWS para Bedrock
+- **FastAPI** - Web framework for REST and WebSocket
+- **LangGraph** - Workflow orchestration with graphs
+- **LangChain** - LLM framework
+- **Amazon Bedrock** - Nova Pro (LLM model)
+- **MCP (Model Context Protocol)** - Tool protocol over HTTP REST
+- **WebSocket** - Bidirectional real-time communication
+- **Docker & Docker Compose** - Containerization and orchestration
+- **httpx** - Async HTTP client
+- **boto3** - AWS SDK for Bedrock
 
-## ⚠️ Notas Importantes
+## 📝 Important Notes
 
-- **NO subir el archivo `.env`** a GitHub (ya está en `.gitignore`)
-- Las credenciales de AWS son sensibles - manéjalas con cuidado
-## 📝 Notas Importantes
+- **Microservices architecture**: 4 independent containers (LLM Gateway, Toolbox, Agent HTTP, Agent WebSocket)
+- **Centralized LLM Gateway**: Single point to manage multiple AI providers
+- **Secure credentials**: Only LLM Gateway has API keys, agents don't need them
+- **Intelligent cache**: Reduces costs and improves latency with configurable TTL
+- **MCP over HTTP REST**: Real MCP protocol with HTTP transport for K8s compatibility
+- **Dynamic model selection**: Switch between Bedrock/OpenAI/Gemini per request or from prompt
+- **Real-time metrics**: Cost, token, latency, and cache hit rate tracking
+- **Kubernetes ready**: Works perfectly in EKS with service discovery
+- **WebSocket vs HTTP**: WebSocket for interactive UIs, HTTP for integrations
+- **Centralized architecture**: Both agents share the same Toolbox and LLM Gateway
+- Containers automatically restart if they fail
+- If your `AWS_SECRET_ACCESS_KEY` has `/`, regenerate credentials (causes signature errors)
 
-- **Arquitectura de microservicios**: 4 contenedores independientes (LLM Gateway, Toolbox, Agent HTTP, Agent WebSocket)
-- **LLM Gateway centralizado**: Un solo punto para gestionar múltiples proveedores de IA
-- **Credenciales seguras**: Solo el LLM Gateway tiene las API keys, los agentes no las necesitan
-- **Cache inteligente**: Reduce costos y mejora latencia con TTL configurable
-- **MCP sobre HTTP REST**: Protocolo MCP real con transporte HTTP para compatibilidad K8s
-- **Selección dinámica de modelos**: Cambia entre Bedrock/OpenAI/Gemini por request o desde el prompt
-- **Métricas en tiempo real**: Tracking de costos, tokens, latencia y cache hit rate
-- **Listo para Kubernetes**: Funciona perfecto en EKS con service discovery
-- **WebSocket vs HTTP**: WebSocket para UIs interactivas, HTTP para integraciones
-- **Arquitectura centralizada**: Ambos agentes comparten el mismo Toolbox y LLM Gateway
-- Los contenedores se reinician automáticamente si fallan
-- Si tu `AWS_SECRET_ACCESS_KEY` tiene `/`, regenera las credenciales (causa errores de firma)
+## 🎯 Use Cases
 
-## 🎯 Casos de Uso
-
-### Cuándo usar Agent HTTP (REST):
-- ✅ Integraciones con otros servicios/APIs
-- ✅ APIs públicas REST
+### When to use Agent HTTP (REST):
+- ✅ Integrations with other services/APIs
+- ✅ Public REST APIs
 - ✅ Webhooks
-- ✅ Automatizaciones batch
-- ✅ Sistemas que necesitan caching
-- ✅ Request/response simple
+- ✅ Batch automations
+- ✅ Systems that need caching
+- ✅ Simple request/response
 
-### Cuándo usar Agent WebSocket:
-- ✅ Chatbots interactivos
-- ✅ Aplicaciones de chat en tiempo real
-- ✅ Dashboards que necesitan updates live
-- ✅ Streaming de respuestas largas
-- ✅ Notificaciones push
-- ✅ Ver el "pensamiento" del agente paso a paso
+### When to use Agent WebSocket:
+- ✅ Interactive chatbots
+- ✅ Real-time chat applications
+- ✅ Dashboards that need live updates
+- ✅ Streaming of long responses
+- ✅ Push notifications
+- ✅ See agent's "thinking" step by step
 
-### Cuándo usar cada LLM:
+### When to use each LLM:
 - **Bedrock Nova Pro** (`bedrock-nova-pro`):
-  - ✅ Razonamiento complejo
-  - ✅ Largo contexto (300K tokens)
-  - ✅ Costo medio
-  - ✅ Mejor para análisis profundo
+  - ✅ Complex reasoning
+  - ✅ Long context (300K tokens)
+  - ✅ Medium cost
+  - ✅ Best for deep analysis
 
 - **OpenAI GPT-4o** (`gpt-4o`):
-  - ✅ Más capaz y versátil
-  - ✅ Mejor en seguir instrucciones
-  - ✅ Costo más alto
-  - ✅ Requiere créditos activos
+  - ✅ Most capable and versatile
+  - ✅ Best at following instructions
+  - ✅ Higher cost
+  - ✅ Requires active credits
 
 - **Gemini 1.5 Flash** (`gemini-pro`):
-  - ✅ Más rápido
-  - ✅ Costo más bajo
-  - ✅ Bueno para tareas simples
-  - ✅ Excelente para producción
+  - ✅ Faster
+  - ✅ Lower cost
+  - ✅ Good for simple tasks
+  - ✅ Excellent for production
 
-## 🏢 Deployment a AWS/EKS
+## 🏢 Deployment to AWS/EKS
 
-Este proyecto está **listo para producción** en AWS EKS. Ver guía completa en [`docs/DEPLOYMENT_EKS.md`](./docs/DEPLOYMENT_EKS.md)
+This project is **production ready** for AWS EKS. See complete guide at [`docs/DEPLOYMENT_EKS.md`](./docs/DEPLOYMENT_EKS.md)
 
-**Resumen de deployment:**
+**Deployment summary:**
 
-1. **Crear repositorios ECR** para las 4 imágenes (llm-gateway, toolbox, agent-http, agent-websocket)
-2. **Push imágenes Docker** a ECR
-3. **Crear cluster EKS** (o usar existente)
-4. **Configurar Secrets Manager** con credenciales (AWS, OpenAI, Gemini)
-5. **Aplicar manifiestos K8s**:
+1. **Create ECR repositories** for the 4 images (llm-gateway, toolbox, agent-http, agent-websocket)
+2. **Push Docker images** to ECR
+3. **Create EKS cluster** (or use existing)
+4. **Configure Secrets Manager** with credentials (AWS, OpenAI, Gemini)
+5. **Apply K8s manifests**:
    ```bash
    kubectl apply -f k8s/namespace.yaml
    kubectl apply -f k8s/llm-gateway-deployment.yaml
@@ -973,14 +959,14 @@ Este proyecto está **listo para producción** en AWS EKS. Ver guía completa en
    kubectl apply -f k8s/ingress.yaml
    ```
 
-**Service Discovery en Kubernetes:**
+**Service Discovery in Kubernetes:**
 ```yaml
-# Los agents se conectan via DNS interno:
+# Agents connect via internal DNS:
 LLM_GATEWAY_URL: "http://llm-gateway.mcp-system.svc.cluster.local:8003"
 MCP_SERVER_URL: "http://mcp-toolbox.mcp-system.svc.cluster.local:8000"
 ```
 
-**Arquitectura en EKS:**
+**Architecture in EKS:**
 ```
 Internet → ALB Ingress → {
     /api/http → Agent HTTP Service → Agent HTTP Pods
@@ -994,99 +980,98 @@ WebSocket Agent ────┤
                     └──→ MCP Toolbox Service → MCP Toolbox Pods
 ```
 
-## 📖 Documentación Adicional
+## 📖 Additional Documentation
 
-- [`docs/DEPLOYMENT_EKS.md`](./docs/DEPLOYMENT_EKS.md) - Guía completa de despliegue en AWS EKS
-- [`docs/WEBSOCKET_AGENT.md`](./docs/WEBSOCKET_AGENT.md) - Documentación del Agent WebSocket
-- [`test-websocket.html`](./test-websocket.html) - Cliente de prueba interactivo
-- [`k8s/`](./k8s/) - Manifiestos de Kubernetes listos para usar
+- [`docs/DEPLOYMENT_EKS.md`](./docs/DEPLOYMENT_EKS.md) - Complete AWS EKS deployment guide
+- [`docs/WEBSOCKET_AGENT.md`](./docs/WEBSOCKET_AGENT.md) - WebSocket Agent documentation
+- [`test-websocket.html`](./test-websocket.html) - Interactive test client
+- [`k8s/`](./k8s/) - Ready-to-use Kubernetes manifests
 
 ## 🚀 Quick Start
 
 ```bash
-# 1. Clonar repo
+# 1. Clone repo
 git clone https://github.com/LeonAchata/MCP-Server-Prueba.git
 cd MCP-Example
 
-# 2. Configurar credenciales (al menos un proveedor)
+# 2. Configure credentials (at least one provider)
 nano .env
-# Agregar credenciales de AWS Bedrock, OpenAI o Google Gemini
+# Add credentials for AWS Bedrock, OpenAI or Google Gemini
 
-# 3. Levantar servicios
+# 3. Start services
 docker-compose up -d
 
-# 4. Verificar que todo esté funcionando
+# 4. Verify everything is running
 docker-compose ps
 docker-compose logs -f
 
-# 5. Probar HTTP Agent
+# 5. Test HTTP Agent
 curl -X POST http://localhost:8001/process \
   -H "Content-Type: application/json" \
-  -d '{"input":"Suma 10 y 5"}'
+  -d '{"input":"Add 10 and 5"}'
 
-# 6. Probar con diferentes modelos
+# 6. Test with different models
 curl -X POST http://localhost:8001/process \
   -H "Content-Type: application/json" \
-  -d '{"input":"usa gemini, multiplica 7 por 8"}'
+  -d '{"input":"use gemini, multiply 7 by 8"}'
 
-# 7. Probar WebSocket Agent
-# Abre test-websocket.html en tu navegador
+# 7. Test WebSocket Agent
+# Open test-websocket.html in your browser
 
-# 8. Ver métricas del gateway
+# 8. View gateway metrics
 curl http://localhost:8003/metrics
 ```
 
 ## 🔧 Troubleshooting
 
 ### Error: "LLM Gateway error (404): LLM 'xxx' not found"
-- Verifica que el nombre del modelo sea correcto: `bedrock-nova-pro`, `gpt-4o`, o `gemini-pro`
-- Revisa los logs: `docker-compose logs llm-gateway --tail=50`
+- Verify the model name is correct: `bedrock-nova-pro`, `gpt-4o`, or `gemini-pro`
+- Check logs: `docker-compose logs llm-gateway --tail=50`
 
 ### Error: OpenAI "insufficient_quota"
-- No tienes créditos en tu cuenta de OpenAI
-- Solución: Usa Bedrock o Gemini, o agrega créditos en OpenAI
+- You don't have credits in your OpenAI account
+- Solution: Use Bedrock or Gemini, or add credits to OpenAI
 
 ### Error: Gemini "model not found"
-- Verifica que `GEMINI_DEFAULT_MODEL=gemini-1.5-flash` en tu `.env`
-- Asegúrate de tener habilitada la API de Gemini en Google Cloud
+- Verify that `GEMINI_DEFAULT_MODEL=gemini-1.5-flash` in your `.env`
+- Ensure you have Gemini API enabled in Google Cloud
 
 ### Error: "RuntimeError: Event loop is closed"
-- Ya fue corregido en la versión actual
-- Si persiste, verifica que estés usando `async/await` correctamente
+- Already fixed in current version
+- If persists, verify you're using `async/await` correctly
 
-### Los contenedores no inician
+### Containers won't start
 ```bash
-# Ver logs detallados
+# View detailed logs
 docker-compose logs
 
-# Reconstruir todo desde cero
+# Rebuild everything from scratch
 docker-compose down
 docker-compose build --no-cache
 docker-compose up -d
 ```
 
-## 🤝 Contribuciones
+## 🤝 Contributions
 
-Las contribuciones son bienvenidas! Si encuentras un bug o tienes una mejora:
+Contributions are welcome! If you find a bug or have an improvement:
 
-1. Fork el repositorio
-2. Crea una rama (`git checkout -b feature/amazing-feature`)
-3. Commit tus cambios (`git commit -m 'Add amazing feature'`)
-4. Push a la rama (`git push origin feature/amazing-feature`)
-5. Abre un Pull Request
+1. Fork the repository
+2. Create a branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## 📝 Licencia
+## 📝 License
 
-Este es un proyecto de aprendizaje personal. Libre de usar para propósitos educativos.
+This is a personal learning project. Free to use for educational purposes.
 
-## 👨‍💻 Autor
+## 👨‍💻 Author
 
 **Leon Achata**
 - GitHub: [@LeonAchata](https://github.com/LeonAchata)
-- Proyecto: [MCP-Server-Prueba](https://github.com/LeonAchata/MCP-Server-Prueba)
-
+- Project: [MCP-Server-Prueba](https://github.com/LeonAchata/MCP-Server-Prueba)
 ---
 
 **Happy coding! 🚀**
 
-*Sistema Multi-Agent con MCP Protocol + LLM Gateway - Production Ready*
+*Multi-Agent System with MCP Protocol + LLM Gateway - Production Ready*
